@@ -1,0 +1,60 @@
+GO:
+
+ - Compile go app:
+ GOOS=linux GOARCH=amd64 go build -o bin/app .
+
+
+ROLE:
+
+ - Create role:
+aws --endpoint http://localhost:4566 --profile default iam create-role  --role-name lambda-execution \
+  --assume-role-policy-document "{\"Version\": \"2012-10-17\",\"Statement\": [{ \"Effect\": \"Allow\", \"Principal\": {\"Service\": \"lambda.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}"
+
+
+POLICIES:
+
+- Create Policy:
+aws iam create-policy --policy-name my-pol --policy-document file://pol.txt --endpoint-url http://localhost:4566 
+
+- Atach Policy:
+aws --endpoint http://localhost:4566 --profile default iam attach-role-policy  --role-name lambda-execution  --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole   
+aws --endpoint-url http://localhost:4566 iam attach-role-policy --policy-arn arn:aws:iam::000000000000:policy/my-pol --role-name lambda-execution 
+
+
+LAMBDA:
+
+- Deploy:
+aws --endpoint-url=http://localhost:4566 --profile default lambda create-function --function-name golang-localstack --runtime go1.x --role=arn:aws:iam::000000000000:role/lambda-execution --handler=app --zip-file fileb://bin/app.zip
+
+- Create trigger:
+aws lambda create-event-source-mapping --function-name golang-localstack --batch-size 5 --maximum-batching-window-in-seconds 60  --event-source-arn arn:aws:sqs:sa-east-1:000000000000:my-queue --endpoint-url http://localhost:4566
+
+
+SQS:
+
+- Create queue:
+aws --endpoint-url=http://localhost:4566 sqs create-queue --queue-name my-queue
+
+- List queues:
+aws --endpoint-url=http://localhost:4566 sqs list-queues    
+
+
+S3:
+
+- Create S3:
+aws s3 mb s3://mybucket --region sa-east-1 --endpoint-url http://localhost:4566 
+
+- Set trigger:
+aws s3api put-bucket-notification-configuration --bucket mybucket --notification-configuration file://notification.json --endpoint-url http://localhost:4566
+
+- Upload file:
+aws s3 cp Myfile.txt s3://mybucket --endpoint-url http://localhost:4566 
+
+
+LOGS:
+
+- List logs groups:
+aws --endpoint-url http://localhost:4566 logs describe-log-groups 
+
+- Show log:
+aws --endpoint-url http://localhost:4566 logs tail /aws/lambda/golang-localstack  
