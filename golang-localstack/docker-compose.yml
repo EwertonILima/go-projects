@@ -13,11 +13,8 @@ services:
       - "127.0.0.1:4566:4566"
       - "127.0.0.1:4571:4571"
     environment:
-      - LOCALSTACK_HOSTNAME=localhost
-      - HOST_TMP_FOLDER=/tmp/localstack
+      - LOCALSTACK_HOST=localhost
       - DOCKER_HOST=unix:///var/run/docker.sock
-      - DEFAULT_REGION=us-east-1
-      - LAMBDA_EXECUTOR=docker
       - DEBUG=0
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"

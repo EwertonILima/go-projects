@@ -23,7 +23,10 @@ aws --endpoint-url http://localhost:4566 iam attach-role-policy --policy-arn arn
 
 LAMBDA:
 
-- Deploy:
+- Deploy new:
+aws --endpoint-url=http://localhost:4566 --profile default lambda create-function --function-name golang-localstack --runtime provided.al2 --role=arn:aws:iam::000000000000:role/lambda-execution --handler=app --zip-file fileb://bootstrap.zip
+
+- Deploy deprecated:
 aws --endpoint-url=http://localhost:4566 --profile default lambda create-function --function-name golang-localstack --runtime go1.x --role=arn:aws:iam::000000000000:role/lambda-execution --handler=app --zip-file fileb://bin/app.zip
 
 - Create trigger:
