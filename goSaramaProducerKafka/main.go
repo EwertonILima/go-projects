@@ -12,7 +12,7 @@ func main() {
 
 	brokers := []string{"localhost:9092"}
 
-	producer, err := sarama.NewSyncProducer(brokers, config)
+	producer, err := NewSaramaProducer(brokers, config)
 	if err != nil {
 		panic(err)
 	}
